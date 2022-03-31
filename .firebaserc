@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "msb-companion"
+  },
+  "targets": {
+    "msb-companion": {
+      "hosting": {
+        "os": [
+          "msb-os"
+        ]
+      }
+    }
+  }
+}
