@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'home.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:msb_os/views/schedule_view.dart';
+import 'firebase_options.dart';
 
-void main() {
+import 'views/home_view.dart';
+
+const robotID = '1234';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -17,7 +27,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Home(),
+      home: const HomeView(),
+      routes: {
+        '/schedule': (context) => const ScheduleView()
+      },
     );
   }
 }

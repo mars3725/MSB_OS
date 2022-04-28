@@ -1,23 +1,28 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_tts/flutter_tts_web.dart';
 import 'package:msb_os/eye.dart';
+import 'package:msb_os/views/activity_view.dart';
 
 import 'dart:math';
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+import '../main.dart';
+
+bool sleep = true;
+
+class HomeView extends StatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeViewState extends State<HomeView> {
   Alignment lookDirection = Alignment.center;
   double squint = 0;
-  bool sleep = true;
 
   TtsState ttsState = TtsState.stopped;
   FlutterTts flutterTts = FlutterTts();
@@ -28,24 +33,11 @@ class _HomeState extends State<Home> {
     super.initState();
     initTts();
 
-    //Look around periodically
-    Timer.periodic(const Duration(seconds: 12), (timer) =>
-        Future.delayed(Duration(seconds: Random().nextInt(4) + 5), () {
-          setState(() => lookDirection = Alignment(
-            (Random().nextInt(100) -100)/100,
-            (Random().nextInt(100) -100)/100,
-          ));
-        }).then((value) => Future.delayed(Eye.lookDuration, () {
-          setState(() => lookDirection = Alignment.center);
-        })));
+    FirebaseFirestore.instance.collection('robots').doc(robotID).snapshots().listen(
+            (event)=> flutterTts.setVolume(event.get('volume'))
+    );
 
-    //Blink periodically
-    Timer.periodic(const Duration(seconds: 10), (timer) =>
-        Future.delayed(Duration(seconds: Random().nextInt(4) + 5), () {
-          setState(() => squint = 0);
-        }).then((value) => Future.delayed(Eye.blinkDuration, () {
-          setState(() => squint = 1);
-        })));
+    animateEyes();
   }
 
   Future initTts() async {
@@ -103,7 +95,24 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     List<OutlinedButton> actions = [
       OutlinedButton(onPressed: () {},
-          child: const Text('Play',
+        child: Text('Call',
+            style: TextStyle(
+                fontSize: 48,
+                color: Colors.grey.shade800
+            )
+        ),
+        style: OutlinedButton.styleFrom(
+            side: BorderSide(color: Colors.grey.shade800, width: 5),
+            padding: const EdgeInsets.all(20)
+        ),
+      ),
+      OutlinedButton(onPressed: ()=> FirebaseFirestore.instance.collection('robots').doc(robotID).get().then(
+              (data) => Navigator.push(context, MaterialPageRoute<void>(
+                builder: (BuildContext context) {
+                  return ActivityView(url: data.get('activityUrl'));
+                },
+              ))),
+          child: const Text('Activity',
               style: TextStyle(
                   fontSize: 48,
                   color: Colors.white
@@ -114,19 +123,7 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.all(20)
         ),
       ),
-      OutlinedButton(onPressed: () {},
-        child: const Text('Call',
-            style: TextStyle(
-                fontSize: 48,
-                color: Colors.white
-            )
-        ),
-        style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Colors.white, width: 5),
-            padding: const EdgeInsets.all(20)
-        ),
-      ),
-      OutlinedButton(onPressed: () {},
+      OutlinedButton(onPressed: ()=> Navigator.pushNamed(context, '/schedule'),
         child: const Text('Schedule',
             style: TextStyle(
                 fontSize: 48,
@@ -236,6 +233,27 @@ class _HomeState extends State<Home> {
         speechText = '';
       });
     }
+  }
+
+  void animateEyes() {
+    //Look around periodically
+    Timer.periodic(const Duration(seconds: 12), (timer) =>
+        Future.delayed(Duration(seconds: Random().nextInt(4) + 5), () {
+          setState(() => lookDirection = Alignment(
+            (Random().nextInt(100) -100)/100,
+            (Random().nextInt(100) -100)/100,
+          ));
+        }).then((value) => Future.delayed(Eye.lookDuration, () {
+          setState(() => lookDirection = Alignment.center);
+        })));
+
+    //Blink periodically
+    Timer.periodic(const Duration(seconds: 10), (timer) =>
+        Future.delayed(Duration(seconds: Random().nextInt(4) + 5), () {
+          setState(() => squint = 0);
+        }).then((value) => Future.delayed(Eye.blinkDuration, () {
+          setState(() => squint = 1);
+        })));
   }
 
   void lookLeftThenRight() {
