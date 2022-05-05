@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:msb_os/views/schedule_view.dart';
 import 'firebase_options.dart';
 
 import 'views/home_view.dart';
@@ -28,9 +27,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomeView(),
-      routes: {
-        '/schedule': (context) => const ScheduleView()
-      },
     );
   }
 }

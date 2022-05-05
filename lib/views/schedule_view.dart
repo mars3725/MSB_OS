@@ -100,9 +100,8 @@ class _ScheduleViewState extends State<ScheduleView> {
                         children: [...times,
                           ...events,
                           Positioned(
-                          top: 60*widget.scale*TimeOfDay.now().hour+TimeOfDay.now().minute,
+                          top: 60*widget.scale*TimeOfDay.now().hour+TimeOfDay.now().minute*widget.scale,
                           left: 15,
-                          height: 60*widget.scale,
                           width: MediaQuery.of(context).size.width-30,
                           child: const Divider(color: Colors.orange, height: 4, thickness: 4),
                         )],

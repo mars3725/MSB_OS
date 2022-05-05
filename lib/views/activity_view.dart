@@ -24,8 +24,7 @@ class _ActivityViewState extends State<ActivityView> {
 
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry.registerViewFactory(
-        'iframeElement',
-            (int viewId) => _iframeElement
+        'iframeElement', (int viewId) => _iframeElement
     );
   }
 
